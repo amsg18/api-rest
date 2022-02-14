@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/amsg18/api-rest/issues"
   },
-  "homepage": "https://github.com/amsg18/api-rest#readme"
+  "homepage": "https://github.com/amsg18/api-rest#readme",
+  "dependencies": {
+    "express": "^4.17.2"
+  }
 }
