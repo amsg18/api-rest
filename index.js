@@ -2,12 +2,19 @@
 
 const cors = require('cors');
 const port = process.env.PORT || 3000; 
- 
+const https=require('https');
+const fs= require('fs');
+const OPTIONS_HTTPS ={  
+  key: fs.readFileSync('./cert/key.pem'),
+  cert: fs.readFileSync('./cert/cert.pem')
+};
+
 const express = require('express'); 
 const logger = require('morgan');
 const mongojs = require('mongojs');
 
 const app = express();
+
 
 var db= mongojs("SD");
 var id= mongojs.ObjectID;
@@ -105,9 +112,12 @@ app.delete('/api/:coleccion/:id',auth, (req, res, next) => {
       res.json(resultado);
     });
 });
-
 //Iniciamos la applicación
-  app.listen(port, () => { 
+https.createServer(OPTIONS_HTTPS, app).listen(port, () => { 
+  console.log(`SEC WS API REST CRUD con DB ejecutándose en https://localhost:${port}/api/:coleccion/:id`); 
+});
+
+ /* app.listen(port, () => { 
     console.log(`API REST CRUD ejecutándose en http://localhost:${port}/api/:coleccion/:id`); 
-  });
+  });*/
 

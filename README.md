@@ -1,6 +1,6 @@
 # Backend CRUD API REST
 
-_Ejemplo de WS REST con NodeJS que proporciona un API CRUD para gestionar una DB MongoDB._
+_Ejemplo de WS REST con NodeJS que proporciona un API CRUD para gestionar una DB MongoDB aplicándole seguridad._
 
 ## Comenzando 🚀
 
@@ -25,6 +25,7 @@ Ver **Deployment** para conocer cómo desplegar el proyecto.
 	-NodeJs- node y npm
 	-Git, con una cuenta con un repositorio en GitHub o bitbacket
 	-MongoDB
+	-El paquete CORS
 
 Para comprobar los datos de la máquina virtual abrimos una terminal con 
 ```
@@ -35,7 +36,6 @@ $ df -h
 ```
 
 ### Instalación 🔧
-Instalar navegador, editor de texto express nodemon
 
 Instalaremos:
 	·Un editor de texto, en este caso Visual Studio Code.
@@ -50,7 +50,9 @@ Instalaremos:
 	
 	·Una política de registro logs, Morgan.
 
-	·Una base de datos, Mongo db
+	·Una base de datos, Mongo DB
+	
+	·El paquete CORS, mecanismo que utiliza encabezados adicionales HTTP para permitir que un user agent obtenga permiso para acceder a recursos ubicados en servidores que estén en dominios distintos al dominio de la aplicación.
 _Instalación de Visual Studio Code y cómo lanzarlo_
 
 ```
@@ -110,14 +112,87 @@ sudo apt update
 sudo apt install -y mongodb
 ```
 
+_Instalación del paquete CORS_
+```
+npm i -S cors
+```
+Habrá que importar y escribir ciertas sentencias para poder utilizarlo en nuestro proyecto:
+```
+/ Imports
+const cors = require('cors');
+// Declaraciones
+var allowCrossTokenHeader = (req, res, next) => {
+res.header("Access-Control-Allow-Headers", "*");
+return next();
+};
+var allowCrossTokenOrigin = (req, res, next) => {
+res.header("Access-Control-Allow-Origin", "*");
+return next();
+};
+// Middlewares
+app.use(cors());
+app.use(allowCrossTokenHeader);
+app.use(allowCrossTokenOrigin);
+```
+Después se creará una variable, en este caso la denomino auth, para poder proteger los métodos HTTP que veas convenientes con un token
+
+```
+var auth = (req, res, next) => {
+	if(req.headers.token === "password1234") {
+	 	return next();
+ 	} else {
+		return next(new Error("No autorizado"));
+ 	};
+ };
+```
+_Creación de un certificado con openssl_
+Crear un certificado autofirmado.
+ Primero creamos una clave privada:
+```
+Ctrl+alt+T
+cd (dirección de tu proyecto)
+openssl genrsa -out key.pem
+
+```
+Creamos un certificado sin firmar e introduces los datos a identificar
+```
+openssl req -new -key key.pem -out csr.pem
+```
+Firmamos el certificado
+```
+openssl x509 -req -days 9999 -in csr.pem -signkey key.pem -out cert.pem
+
+```
 ## Ejecutando las pruebas ⚙️
 
 _Para poder ejecutar las pruebas habrá que realizar primero el despliegue_
-En el navegador podrás ejecutar los get, pero para poder realizar tanto los post, los put y los delete tendrás que utilizar postman.
+En el navegador podrás ejecutar los get, pero para poder realizar tanto los post, los put y los delete tendrás que utilizar postman, además que al aplicarle seguridad no te permitirá realizarlo sin un token de acceso.
 Hay que tener en cuenta de que si realizas los get sin tener datos guardados no se va a obtener nada como respuesta.
 Por ello primero es conveniente realizar algún post.
 
+_Para aplicar seguridad al proyecto_
+Con el paquete cors podemos añadir a nuestras pruebas
+
 ### Analice las pruebas end-to-end 🔩
+Cosas añadidas al código de la versión anterior:
+Hemos creado el servicio de https importando la biblioteca de progrmación https:
+```
+const https=require('https');
+```
+Módulo para acceder al filesystem:
+
+```
+const fs= require('fs');
+```
+Nos creamos unas opciones con la key y el certificado:
+
+```
+OPTIONS_HTTPS={
+  key:fs.readFileSync('./cert/key.pem'),
+  cert:fs.readFileSync('./cert/key.pem')
+};
+```
+
 
 Al realizar las pruebas con el postman, los datos se guardarán en la base creada en MongoDB, entonces podrás utilizar comandos de mongo en la terminal para poder ver o encontrar los datos de tu base de datos.
 Por ejemplo:
