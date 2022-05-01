@@ -187,12 +187,21 @@ const fs= require('fs');
 Nos creamos unas opciones con la key y el certificado:
 
 ```
-OPTIONS_HTTPS={
+const OPTIONS_HTTPS={
   key:fs.readFileSync('./cert/key.pem'),
   cert:fs.readFileSync('./cert/key.pem')
 };
 ```
+Hemos hecho un parche intermedio para decir que cuando acabe de hacer lo que tenga que hacer el https llame al express cambiando lo que habría sido en http:
+```
+/* app.listen(port, () => { 
+    console.log(`API REST CRUD ejecutándose en http://localhost:${port}/api/:coleccion/:id`); 
+  });*/
+```
+Por:
+```
 
+```
 
 Al realizar las pruebas con el postman, los datos se guardarán en la base creada en MongoDB, entonces podrás utilizar comandos de mongo en la terminal para poder ver o encontrar los datos de tu base de datos.
 Por ejemplo:

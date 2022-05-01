@@ -18,20 +18,21 @@ const app = express();
 
 var db= mongojs("SD");
 var id= mongojs.ObjectID;
+
 var allowCrossTokenHeader = (req, res, next)=> {
   res.header("Access-Control-Allow-Headers", "*");
   return next();
 };
 var allowCrossTokenOrigin = (req, res, next)=>{
-  res.header("Access-Control.Allow.Origin", "*");
+  res.header("Access-Control-Allow-Origin", "*");
   return next();
 };
-var allowMethods = (req, res, next) => {
+/*var allowMethods = (req, res, next) => {
   res.header("Access-Control-Allow-Methods","GET, POST, PUT, DELETE, OPTIONS");
   return next();
-}
+}*/
 var auth= (req, res, next) => {
-  if(req.headers.token === "password1234"){
+  if(req.headers.token === "password1234"){  //header authoritation con el beadet token con split del espacio en blanco y verificarlo
     return next();
   } else {
     return next(new Error("No autorizado"));
@@ -39,12 +40,12 @@ var auth= (req, res, next) => {
 };
 //Declaracion de los middleware
 app.use(logger('dev')); 
-app.use (cors());
+app.use(cors());
 app.use(allowCrossTokenHeader);
 app.use(allowCrossTokenOrigin);
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-app.use(allowMethods);
+//app.use(allowMethods);
 //trigger
 app.param("coleccion",(req,res,next, coleccion) => {
   console.log('param/api/:coleccion');
